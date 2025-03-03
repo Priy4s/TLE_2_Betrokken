@@ -1,0 +1,19 @@
+{
+  "name": "tle_2_betrokken",
+  "version": "1.0.0",
+  "description": "School project for second year",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --env-file=.env --watch index.js",
+    "constructDatabase": "node construct.js"
+  },
+  "author": "Sander Landmeter",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7"
+  },
+  "type": "module"
+}

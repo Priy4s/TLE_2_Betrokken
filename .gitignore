@@ -1,0 +1,4 @@
+.idea
+.env
+storage.sqlite
+.node_modules
