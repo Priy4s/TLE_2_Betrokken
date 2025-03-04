@@ -1,14 +1,14 @@
 import express from 'express';
 import Sequelize from 'sequelize';
 import signsV1 from  './v1/routes/signs.js';
-import db from './storage.sqlite';
+import db from './database.js'
+import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
 const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: './storage.sqlite'
 });
-
 
 //Validate the database connection
 try {
@@ -22,37 +22,13 @@ try {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { v4 as uuidv4 } from 'uuid';
-
-//Temporary saving of the API keys. Change to database later on
-const apiKeys = [];
-
-//Generates API key
-app.post('/generateApiKeys', (req,res) => {
-    const apiKey = uuidv4();
-    apiKeys.push(apiKey);
-    const expiresAt = Date.now() + 60 * 60 * 100
-    res.json({apiKey});
-
-    db.run('INSERT INTO keys (api_keys, expires_at) VALUES (?,?)', [apiKey, expiresAt], (err) => {
-
-    })
-});
-
-// Database heeft een api tabel nodig(gehasht natuurlijk) en een expires_at colom.
-// Cronjob nodig met een timer die kijkt in de database en de expired keys verwijderd.
 
 
-//API key authenticator middeware
-app.use( (req,res,next) => {
-    const apiKey = req.headers['x-api-key']
 
-    if (!apiKey || !apiKeys.includes(apiKey)) {
-        return res.status(401).json({ error: 'Ongeldige of ontbrekende API Key' });
-    }
 
-    next();
-});
+
+
+
 //Global middleware
 //Make sure the client is informed this webservice only sends JSON
 app.use((req, res, next) => {
@@ -80,8 +56,54 @@ app.use((req, res, next) => {
 
 });
 
+//Generates API key
+app.post('/generateApiKeys', (req,res) => {
+    const apiKey = uuidv4();
+    const expiresAt = Date.now() + 60 * 60 * 100
+
+    db.run('INSERT INTO keys (api_keys, expires_at) VALUES (?,?)', [apiKey, expiresAt], (err) => {
+        if(err) {
+            return res.status(500).json({error:'Couldnt push into database'})
+        }
+    })
+    res.status(200).json({ apiKey, expiresAt: new Date(expiresAt).toISOString() });
+});
+
+//API key authenticator middeware
+app.use( (req,res,next) => {
+    const apiKey = req.headers['x-api-key']
+
+    //Checks if there is an API key. If not, error
+    if (!apiKey) {
+        return res.status(401).json({ error: 'API Key vereist' });
+    }
+
+
+    db.run('SELECT ALL FROM keys WHERE api_keys = ? AND expires_at > ?', [apiKey, Date.now()], (err, row) => {
+        if(err) {
+             return res.status(500).json({error: 'Database fout'})
+        }
+
+        if(!row) {
+            return  res.status(401).json({error: 'Ongeldige of verlopen API key'})
+        }
+        next();
+    })
+});
+
+
+
+
+
 //Routes
 app.use('/v1/signs', signsV1);
+
+
+
+
+
+
+// Cronjob nodig met een timer die kijkt in de database en de expired keys verwijderd.
 
 
 //Print the port to the console so we know when it's actually running
