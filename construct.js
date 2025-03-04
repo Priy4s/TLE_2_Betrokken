@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import fs from 'fs';
+import User from './v1/models/User.js';
 
 const sql_file_content = fs.readFileSync('./database_frame.sql', 'utf8');
 
@@ -13,11 +14,36 @@ const sequelize = new Sequelize({
 try {
 
     for (const query of queries) {
+
+        try {
+
         await sequelize.query(query);
+
+        } catch (error) {
+            console.log(error.message)
+        }
+
     }
 
     console.log('Successfully constructed the database')
 
 } catch (error) {
     console.log(error.message)
+}
+
+const [user, created] = await User.findOrCreate({
+    where: { student_number: 9999999},
+    defaults: {
+        student_number: 9999999,
+        name: 'Admin',
+        role: 42,
+    },
+});
+
+if (created) {
+    console.log('Successfully added Admin user')
+} else if (user) {
+    console.log('Admin user already exists')
+} else {
+    console.log('Admin user had not been created and does not exist')
 }
