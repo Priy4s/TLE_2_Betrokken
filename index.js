@@ -48,21 +48,6 @@ app.use((req, res, next) => {
 
 });
 
-//Throw a 400 early if the given id isn't valid
-function validateId(req, res, next) {
-
-    if (!mongoose.Types.ObjectId.isValid(req.params.id) && req.method !== 'OPTIONS') {
-
-        res.status(400);
-        return res.json({error: "Given id is invalid"});
-
-    }
-
-    next();
-
-}
-app.use('/v1/signs/:id', validateId);
-
 //Routes
 app.use('/v1/signs', signs);
 
