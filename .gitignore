@@ -2,3 +2,4 @@
 .env
 storage.sqlite
 node_modules
+package-lock.json
