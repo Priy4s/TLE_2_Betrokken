@@ -1,6 +1,7 @@
 import express from 'express';
 import Sequelize from 'sequelize';
 import signsV1 from  './v1/routes/signs.js';
+import loginV1 from './v1/routes/login.js';
 
 const app = express();
 const sequelize = new Sequelize({
@@ -50,6 +51,7 @@ app.use((req, res, next) => {
 
 //Routes
 app.use('/v1/signs', signsV1);
+app.use('/v1/login', loginV1);
 
 
 //Print the port to the console so we know when it's actually running
