@@ -1,12 +1,14 @@
 import express from 'express';
 import Sequelize from 'sequelize';
 import signsV1 from  './v1/routes/signs.js';
+import db from './storage.sqlite';
 
 const app = express();
 const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: './storage.sqlite'
 });
+
 
 //Validate the database connection
 try {
@@ -20,7 +22,37 @@ try {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+import { v4 as uuidv4 } from 'uuid';
 
+//Temporary saving of the API keys. Change to database later on
+const apiKeys = [];
+
+//Generates API key
+app.post('/generateApiKeys', (req,res) => {
+    const apiKey = uuidv4();
+    apiKeys.push(apiKey);
+    const expiresAt = Date.now() + 60 * 60 * 100
+    res.json({apiKey});
+
+    db.run('INSERT INTO keys (api_keys, expires_at) VALUES (?,?)', [apiKey, expiresAt], (err) => {
+
+    })
+});
+
+// Database heeft een api tabel nodig(gehasht natuurlijk) en een expires_at colom.
+// Cronjob nodig met een timer die kijkt in de database en de expired keys verwijderd.
+
+
+//API key authenticator middeware
+app.use( (req,res,next) => {
+    const apiKey = req.headers['x-api-key']
+
+    if (!apiKey || !apiKeys.includes(apiKey)) {
+        return res.status(401).json({ error: 'Ongeldige of ontbrekende API Key' });
+    }
+
+    next();
+});
 //Global middleware
 //Make sure the client is informed this webservice only sends JSON
 app.use((req, res, next) => {
