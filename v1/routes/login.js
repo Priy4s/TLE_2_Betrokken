@@ -43,6 +43,11 @@ router.use(async (req, res, next) => {
 
 router.post('/', async (req, res) => {
 
+    if (!req.body.code || !req.body.ssoToken) {
+        res.status(400);
+        return res.json({error: 'Please send an object with the following properties: ssoToken, code'})
+    }
+
     try {
 
         const user = await User.findOne({where: {code: req.body.code}});
