@@ -32,9 +32,9 @@ try {
 }
 
 const [user, created] = await User.findOrCreate({
-    where: { student_number: 9999999},
+    where: { code: 'Administrator'},
     defaults: {
-        student_number: 9999999,
+        code: 'Administrator',
         name: 'Admin',
         role: 42,
     },

@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(async (req, res, next) => {
 
     //Skip verification if the login uses admin credentials
-    if (req.body.token === process.env.ADMIN_TOKEN && req.body.student_number === parseInt(process.env.ADMIN_NUMBER)) {
+    if (req.body.token === process.env.ADMIN_TOKEN && req.body.code === process.env.ADMIN_CODE) {
         return next();
     }
 
@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
 
     try {
 
-        const user = await User.findOne({ where: { student_number: req.body.student_number } });
+        const user = await User.findOne({ where: { code: req.body.code } });
 
         if (!user) {
 
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
         }
 
         //TODO: Add an expiration time
-        const json_token = jwt.sign(req.body.student_number, process.env.TOKEN_SECRET);
+        const json_token = jwt.sign(req.body.code, process.env.TOKEN_SECRET);
 
         res.status(200);
         res.json({jwt: json_token});

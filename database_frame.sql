@@ -16,11 +16,11 @@ CREATE TABLE dance_progress
 );
 CREATE TABLE users
 (
-    id             INTEGER PRIMARY KEY AUTOINCREMENT,
-    name           TEXT    NOT NULL,
-    student_number INTEGER NOT NULL,
-    preference_id  INTEGER,
-    role           INTEGER NOT NULL,
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    name          TEXT    NOT NULL,
+    code          TEXT    NOT NULL,
+    preference_id INTEGER,
+    role          INTEGER NOT NULL,
     FOREIGN KEY (preference_id) REFERENCES preferences (id)
 );
 CREATE TABLE signs

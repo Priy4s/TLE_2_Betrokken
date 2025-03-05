@@ -14,8 +14,8 @@ const User = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        student_number: {
-            type: DataTypes.INTEGER,
+        code: {
+            type: DataTypes.STRING,
             allowNull: false
         },
         role: {
