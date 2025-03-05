@@ -51,14 +51,14 @@ router.post('/', async (req, res) => {
 
             //Frontend should redirect to register
             res.status(403);
-            return res.json();
+            return res.json({error: 'User has not yet registered'});
 
         }
 
         const json_token = jwt.sign({code: req.body.code}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
 
         res.status(200);
-        res.json({jwt: json_token});
+        res.json({success: true, jwt: json_token});
 
     } catch (error) {
 
