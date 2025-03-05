@@ -55,8 +55,7 @@ router.post('/', async (req, res) => {
 
         }
 
-        //TODO: Add an expiration time
-        const json_token = jwt.sign(req.body.code, process.env.TOKEN_SECRET);
+        const json_token = jwt.sign({code: req.body.code}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
 
         res.status(200);
         res.json({jwt: json_token});
