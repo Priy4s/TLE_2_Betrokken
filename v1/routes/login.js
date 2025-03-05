@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(async (req, res, next) => {
 
     //Skip verification if the login uses admin credentials
-    if (req.body.token === process.env.ADMIN_TOKEN && req.body.code === process.env.ADMIN_CODE) {
+    if (req.body.ssoToken === process.env.ADMIN_TOKEN && req.body.code === process.env.ADMIN_CODE) {
         return next();
     }
 
@@ -18,7 +18,7 @@ router.use(async (req, res, next) => {
         const response = await fetch("https://cmgt.hr.nl/api/validate-sso-token", {
             method: "GET",
             headers: {
-                "Token": req.body.token,
+                "Token": req.body.ssoToken
             },
         });
 
@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
 
     try {
 
-        const user = await User.findOne({ where: { code: req.body.code } });
+        const user = await User.findOne({where: {code: req.body.code}});
 
         if (!user) {
 
@@ -68,5 +68,16 @@ router.post('/', async (req, res) => {
     }
 
 });
+
+router.options('/', (req, res) => {
+
+    res.setHeader('Allow', "POST, OPTIONS");
+    res.setHeader('Access-Control-Allow-Methods', "POST, OPTIONS");
+
+    res.status(204);
+    res.send();
+
+});
+
 
 export default router;
