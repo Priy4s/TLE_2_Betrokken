@@ -22,6 +22,35 @@ router.get('/', async (req, res) => {
 
 });
 
+//Create a new sign
+router.post('/', async (req, res) => {
+
+    //Build a model based on the req.body so we can validate it's contents
+    const sign = Sign.build(req.body);
+
+    try {
+
+        await sign.validate();
+
+    } catch (error) {
+        
+        let errorMessages = [];
+
+        for (const validationError of error.errors) {
+            errorMessages.push({error: validationError.message});
+        }
+
+        res.status(400);
+        return res.json(errorMessages);
+
+    }
+
+    res.status(201);
+    res.json({success:true, sign: sign});
+
+
+});
+
 //Options for sign collection
 router.options('/', (req, res) => {
 
