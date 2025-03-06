@@ -25,12 +25,14 @@ router.get('/', async (req, res) => {
 //Create a new sign
 router.post('/', async (req, res) => {
 
-    //Build a model based on the req.body so we can validate it's contents
+    //Build a model based on the req.body so we can validate its contents
     const sign = Sign.build(req.body);
 
+    //Validate the data before saving it to the database
     try {
 
         await sign.validate();
+        sign.lesson = parseInt(sign.lesson);
 
     } catch (error) {
         
@@ -42,6 +44,18 @@ router.post('/', async (req, res) => {
 
         res.status(400);
         return res.json(errorMessages);
+
+    }
+
+    //Save the new sign to the database
+    try {
+
+        await sign.save();
+
+    } catch(error) {
+
+        res.status(500);
+        return res.json({error: 'Something went wrong on the server, please try again'});
 
     }
 

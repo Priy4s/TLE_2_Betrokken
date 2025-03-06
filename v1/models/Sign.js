@@ -38,18 +38,6 @@ const Sign = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true
         },
-        type: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'type must be provided'
-                },
-                notEmpty: {
-                    msg: 'type can not be empty'
-                },
-            }
-        },
         lesson: {
             type: DataTypes.TINYINT,
             allowNull: false,
