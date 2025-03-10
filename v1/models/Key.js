@@ -13,12 +13,14 @@ const Key = sequelize.define(
     {
         api_keys: {
             type: DataTypes.TEXT,
-            alllowNull: false
+            allowNull: false
         },
-        experis_at: {
+        expires_at: {
             type: DataTypes.INTEGER,
             allowNull: false
         }
+    }, {
+        tableName: 'keys'
     }
 );
 
