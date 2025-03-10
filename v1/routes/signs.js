@@ -8,7 +8,14 @@ router.get('/', async (req, res) => {
 
     try {
 
-        const signs = await Sign.findAll();
+        const signs = await Sign.findAll({
+            attributes: [
+                'id',
+                'definition',
+                'theme',
+                'lesson'
+            ]
+        });
 
         res.status(200);
         res.json(signs);
@@ -35,7 +42,7 @@ router.post('/', async (req, res) => {
         sign.lesson = parseInt(sign.lesson);
 
     } catch (error) {
-        
+
         let errorMessages = [];
 
         for (const validationError of error.errors) {
@@ -52,7 +59,7 @@ router.post('/', async (req, res) => {
 
         await sign.save();
 
-    } catch(error) {
+    } catch (error) {
 
         res.status(500);
         return res.json({error: 'Something went wrong on the server, please try again'});
@@ -60,7 +67,7 @@ router.post('/', async (req, res) => {
     }
 
     res.status(201);
-    res.json({success:true, sign: sign});
+    res.json({success: true, sign: sign});
 
 
 });
