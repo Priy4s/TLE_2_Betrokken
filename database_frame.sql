@@ -122,7 +122,7 @@ CREATE TABLE facial_expression_sign
 );
 CREATE TABLE keys
 (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    api_keys TEXT UNIQUE NOT NULL,
-    expires_at INTEGER NOT NULL
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    api_keys   TEXT UNIQUE NOT NULL,
+    expires_at INTEGER     NOT NULL
 );

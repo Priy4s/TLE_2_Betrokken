@@ -49,18 +49,6 @@ app.use((req, res, next) => {
 
 });
 
-//Generates API key
-app.post('/generateApiKeys', (req,res) => {
-    const apiKey = uuidv4();
-    const expiresAt = Date.now() + 60 * 60 * 24000
-
-    db.run('INSERT INTO keys (api_keys, expires_at) VALUES (?,?)', [apiKey, expiresAt], (err) => {
-        if(err) {
-            return res.status(500).json({error:'Couldnt push into database'})
-        }
-    })
-    res.status(200).json({ apiKey, expiresAt: new Date(expiresAt).toISOString() });
-});
 
 //API key authenticator middeware
 app.use( (req,res,next) => {
@@ -68,7 +56,7 @@ app.use( (req,res,next) => {
     console.log(apiKey)
     //Checks if there is an API key. If not, error
     if (!apiKey) {
-        return res.status(401).json({ error: 'API Key vereist' });
+        return res.status(403).json({ error: 'API Key vereist' });
     }
 
     //DB query that checks time and current api key
@@ -80,7 +68,7 @@ app.use( (req,res,next) => {
 
         //If api key doesn't exist, or isn't valid
         if(!row) {
-            return  res.status(401).json({error: 'Ongeldige of verlopen API key'})
+            return  res.status(403).json({error: 'Ongeldige of verlopen API key'})
         }
         next();
     })
