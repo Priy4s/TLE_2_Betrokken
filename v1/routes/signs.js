@@ -1,5 +1,7 @@
 import express from 'express';
 import Sign from '../models/Sign.js';
+import facial_expression from "../models/Facial_expression.js";
+import FacialExpression from "../models/Facial_expression.js";
 
 const router = express.Router();
 
@@ -59,6 +61,57 @@ router.post('/', async (req, res) => {
 
         await sign.save();
 
+        //Add any facial expressions if needed
+        if (req.body.expressions) {
+
+            if (Array.isArray(req.body.expressions)) {
+
+                for (const expression of req.body.expressions) {
+
+                    if (Number.isSafeInteger(expression)) {
+                        const expr = await FacialExpression.findByPk(expression);
+
+                        if (expr) {
+                            await sign.addFacialExpression(expr);
+                        }
+                    }
+
+                }
+
+            } else if (Number.isSafeInteger(req.body.expressions)) {
+
+                const expr = await FacialExpression.findByPk(req.body.expressions);
+
+                if (expr) {
+                    await sign.addFacialExpression(expr);
+                }
+
+            } else {
+
+                const expr = await FacialExpression.findOne({where: {name: 'geen'}});
+
+                if (expr) {
+                    await sign.addFacialExpression(expr);
+                }
+
+            }
+
+        } else {
+            const expr = await FacialExpression.findOne({where: {name: 'geen'}});
+
+            if (expr) {
+                await sign.addFacialExpression(expr);
+            }
+        }
+
+
+        await sign.reload({
+            include: [{
+                model: facial_expression,
+                through: {attributes: []}
+            }]
+        });
+
     } catch (error) {
 
         res.status(500);
@@ -88,7 +141,7 @@ router.get('/:id', async (req, res) => {
 
     try {
 
-        const sign = await Sign.findByPk(req.params.id);
+        const sign = await Sign.findByPk(req.params.id, {include: facial_expression});
 
         if (!sign) {
             res.status(404);

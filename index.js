@@ -2,6 +2,9 @@ import express from 'express';
 import Sequelize from 'sequelize';
 import signsV1 from  './v1/routes/signs.js';
 import expressionsV1 from "./v1/routes/facial_expressions.js";
+import Sign from "./v1/models/Sign.js";
+import FacialExpression from "./v1/models/Facial_expression.js";
+import Facial_expression_sign from "./v1/models/Facial_expression_sign.js";
 
 const app = express();
 const sequelize = new Sequelize({
@@ -48,6 +51,11 @@ app.use((req, res, next) => {
     next();
 
 });
+
+//Add relations to models
+FacialExpression.belongsToMany(Sign, {through: Facial_expression_sign});
+Sign.belongsToMany(FacialExpression, {through: Facial_expression_sign});
+
 
 //Routes
 app.use('/v1/signs', signsV1);
