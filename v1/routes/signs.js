@@ -107,6 +107,86 @@ router.get('/:id', async (req, res) => {
 
 });
 
+//Update the details of a specific sign
+router.put('/:id', async (req, res) => {
+
+    //Build a model based on the req.body so we can validate its contents
+    const postedSign = Sign.build(req.body);
+
+    //Validate the data before doing anything with the database
+    try {
+
+        await postedSign.validate();
+        postedSign.lesson = parseInt(postedSign.lesson);
+
+    } catch (error) {
+
+        let errorMessages = [];
+
+        for (const validationError of error.errors) {
+            errorMessages.push({error: validationError.message});
+        }
+
+        res.status(400);
+        return res.json(errorMessages);
+
+    }
+
+    try {
+
+        const sign = await Sign.findByPk(req.params.id);
+
+        if (!sign) {
+            res.status(404);
+            return res.json({error: 'Sign not found!'})
+        }
+
+        sign.video_path = req.body.video_path;
+        sign.definition = req.body.definition;
+        sign.lesson = req.body.lesson;
+        sign.theme = req.body.theme;
+
+        await sign.save();
+
+
+        res.status(200);
+        res.json({success: true, sign: sign});
+
+    } catch (error) {
+
+        res.status(500);
+        res.json({error: error.message});
+
+    }
+
+});
+
+//Delete a specific sign
+router.delete('/:id', async (req, res) => {
+
+    try {
+
+        const sign = await Sign.findByPk(req.params.id);
+
+        if (!sign) {
+            res.status(404);
+            return res.json({error: 'Sign not found!'})
+        }
+
+        await sign.destroy();
+
+        res.status(204);
+        res.json();
+
+    } catch (error) {
+
+        res.status(500);
+        res.json({error: error.message});
+
+    }
+
+});
+
 //Options for detail
 router.options('/:id', (req, res) => {
 
