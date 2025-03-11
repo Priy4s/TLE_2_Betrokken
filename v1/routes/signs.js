@@ -142,7 +142,12 @@ router.get('/:id', async (req, res) => {
 
     try {
 
-        const sign = await Sign.findByPk(req.params.id, {include: facial_expression});
+        const sign = await Sign.findByPk(req.params.id, {
+            include: [{
+                model: facial_expression,
+                through: {attributes: []}
+            }]
+        });
 
         if (!sign) {
             res.status(404);
