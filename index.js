@@ -6,6 +6,8 @@ import Key from "./v1/models/Key.js";
 
 ;
 import keysV1 from './v1/routes/keys.js';
+import loginV1 from './v1/routes/login.js';
+import registerV1 from './v1/routes/register.js';
 
 const app = express();
 const sequelize = new Sequelize({
@@ -73,6 +75,7 @@ app.use(async (req, res, next) => {
         const key = await Key.findOne({
             where: {
                 api_keys: apiKey,
+                expires_at: Date.now()
             }
         });
 
@@ -95,6 +98,8 @@ app.use(async (req, res, next) => {
 
 //Routes
 app.use('/v1/signs', signsV1);
+app.use('/v1/login', loginV1);
+app.use('/v1/register', registerV1);
 app.use('/v1/keys', keysV1);
 
 
