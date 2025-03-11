@@ -1,7 +1,6 @@
 import express from 'express';
 import Sequelize, {Op} from 'sequelize';
 import signsV1 from './v1/routes/signs.js';
-import db from './database.js'
 import Key from "./v1/models/Key.js";
 
 ;
