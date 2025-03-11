@@ -52,31 +52,42 @@ app.use((req, res, next) => {
 
 });
 
-//API Key router
-app.use('/v1/keys', keysV1);
-
-//API key authenticator middeware
+//API key authenticator middleware
 app.use(async (req, res, next) => {
+
+    //Skip authentication if the method is options for preflight stuff
+    //Also skip it if you're trying to generate a key
+    if (req.path === '/v1/keys/generateApiKeys' || req.method === 'OPTIONS') {
+        return next();
+    }
+
     try {
+
         const apiKey = req.headers['x-api-key'];
-        console.log(apiKey);
+
         //Checks if there is an API key. If not, error
         if (!apiKey) {
-            return res.status(403).json({error: 'API Key vereist'});
+            return res.status(403).json({error: 'API Key required'});
         }
 
         const key = await Key.findOne({
             where: {
                 api_keys: apiKey,
-                expires_at: Date.now()
             }
         });
+
         if (!key) {
-            return res.status(403).json({error: 'Key is ongeldig'});
+            return res.status(403).json({error: 'Key is invalid'});
         }
+
+        if (key.expires_at <= Date.now()) {
+            return res.status(403).json({error: 'Key is no longer valid, please request a new one'});
+        }
+
         next();
+
     } catch {
-        return res.status(500).json({error: 'Database fout'})
+        return res.status(500).json({error: 'Database error'})
     }
 
 });
@@ -84,11 +95,14 @@ app.use(async (req, res, next) => {
 
 //Routes
 app.use('/v1/signs', signsV1);
+app.use('/v1/keys', keysV1);
 
 
 // Cronjob/Timer that deletes invalid keys.
 setInterval(async () => {
+
     try {
+
         await Key.destroy({
             where: {
                 expires_at: {
@@ -96,10 +110,13 @@ setInterval(async () => {
                 }
             }
         });
-        console.log('Key succesvol verwijderd')
+
+        console.log('Key successfully deleted');
+
     } catch {
-        console.log('Fout bij verwijderen van key');
+        console.log('Error occurred when removing a key');
     }
+
 }, 5 * 60 * 1000);
 
 //Print the port to the console so we know when it's actually running
