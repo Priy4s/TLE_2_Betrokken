@@ -2,8 +2,9 @@ import express from 'express';
 import Sequelize, {Op} from 'sequelize';
 import signsV1 from './v1/routes/signs.js';
 import Key from "./v1/models/Key.js";
+import aiV1 from './v1/routes/ai.js';
 
-;
+
 import keysV1 from './v1/routes/keys.js';
 import loginV1 from './v1/routes/login.js';
 import registerV1 from './v1/routes/register.js';
@@ -99,6 +100,7 @@ app.use('/v1/signs', signsV1);
 app.use('/v1/login', loginV1);
 app.use('/v1/register', registerV1);
 app.use('/v1/keys', keysV1);
+app.use('/v1/ai', aiV1);
 
 
 // Cronjob/Timer that deletes invalid keys.
