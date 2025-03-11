@@ -75,7 +75,6 @@ app.use(async (req, res, next) => {
         const key = await Key.findOne({
             where: {
                 api_keys: apiKey,
-                expires_at: Date.now()
             }
         });
 
