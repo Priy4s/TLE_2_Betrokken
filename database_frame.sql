@@ -119,3 +119,9 @@ CREATE TABLE facial_expression_sign
     FOREIGN KEY (facial_expression_id) REFERENCES facial_expressions (id),
     FOREIGN KEY (sign_id) REFERENCES signs (id)
 );
+CREATE TABLE keys
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    api_keys   TEXT UNIQUE NOT NULL,
+    expires_at INTEGER     NOT NULL
+);
