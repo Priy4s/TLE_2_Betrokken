@@ -46,7 +46,7 @@ try {
         for (const [theme, signs] of Object.entries(lessonData.theme)) {
             for (const sign of signs) {
                 const newSign = Sign.create({
-                    video_path: `${process.env.HOST_ADDRESS}:${process.env.EXPRESS_PORT}/videos/${sign.replace(/\s/g, '-')}.mp4`,
+                    video_path: `http//145.24.223.196:8008/videos/${sign.replace(/\s/g, '-')}.mp4`,
                     definition: sign,
                     model_path: "AI",
                     lesson: lesson,
