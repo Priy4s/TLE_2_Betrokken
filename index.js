@@ -12,6 +12,7 @@ import FacialExpression from "./v1/models/Facial_expression.js";
 import Facial_expression_sign from "./v1/models/Facial_expression_sign.js";
 import User from "./v1/models/User.js";
 import jwt from 'jsonwebtoken';
+import profilesV1 from './v1/routes/profiles.js';
 
 const app = express();
 const sequelize = new Sequelize({
@@ -66,7 +67,7 @@ app.use((req, res, next) => {
         return next();
     }
 
-    //Skip authenticating if trying to log in or view profile
+    //Skip authenticating if trying to log in
     let skip = false;
 
     switch (req.path) {
@@ -124,6 +125,9 @@ app.use((req, res, next) => {
         case '/v1/login':
             allowAccess = true;
             break;
+        case '/v1/profiles':
+            allowAccess = true;
+            break;
     }
 
     if (allowAccess) {
@@ -158,6 +162,7 @@ app.use('/v1/register', registerV1);
 app.use('/v1/keys', keysV1);
 app.use('/v1/ai', aiV1);
 app.use('/v1/expressions', expressionsV1);
+app.use('/v1/profiles', profilesV1);
 
 
 // Cronjob/Timer that deletes invalid keys.
