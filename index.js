@@ -130,7 +130,7 @@ setInterval(async () => {
         console.log('Error occurred when removing a key');
     }
 
-}, 5 * 60 * 1000);
+}, 60 * 60 * 1000);
 
 //Print the port to the console so we know when it's actually running
 app.listen(process.env.EXPRESS_PORT, () => {
