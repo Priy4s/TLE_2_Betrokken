@@ -12,10 +12,6 @@ const sequelize = new Sequelize({
 const Key = sequelize.define(
     'Key',
     {
-        api_keys: {
-            type: DataTypes.TEXT,
-            allowNull: false
-        },
         expires_at: {
             type: DataTypes.INTEGER,
             allowNull: false

@@ -1,6 +1,5 @@
 import express from 'express';
 import User from '../models/User.js';
-import {v4 as uuidv4} from "uuid";
 import Key from "../models/Key.js";
 import {BaseError} from "sequelize";
 
@@ -45,11 +44,9 @@ router.post('/', async (req, res) => {
             await user.reload();
 
             //Give them a new API key
-            const apiKey = uuidv4();
             const expiresAt = Date.now() + 60 * 60 * 730000 * 6;
 
             await Key.create({
-                api_keys: apiKey,
                 expires_at: expiresAt,
                 user_id: user.id
             });

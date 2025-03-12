@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 import fs from 'fs';
 import Facial_expression from "./v1/models/Facial_expression.js";
 import User from './v1/models/User.js';
-import {v4 as uuidv4} from "uuid";
 import Key from "./v1/models/Key.js";
 
 const sql_file_content = fs.readFileSync('./database_frame.sql', 'utf8');
@@ -20,7 +19,7 @@ try {
 
         try {
 
-        await sequelize.query(query);
+            await sequelize.query(query);
 
         } catch (error) {
             console.log(error.message)
@@ -62,7 +61,7 @@ try {
 }
 
 const [user, created] = await User.findOrCreate({
-    where: { code: 'Administrator'},
+    where: {code: 'Administrator'},
     defaults: {
         code: 'Administrator',
         name: 'Admin',
@@ -73,10 +72,7 @@ const [user, created] = await User.findOrCreate({
 //Give the admin a semi-permanent key
 if (user) {
 
-    const apiKey = uuidv4();
-
     const key = await Key.create({
-        api_keys: apiKey,
         expires_at: 8000000000000000,
         user_id: user.id
     });
