@@ -122,6 +122,8 @@ CREATE TABLE facial_expression_sign
 CREATE TABLE keys
 (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER     NOT NULL,
     api_keys   TEXT UNIQUE NOT NULL,
-    expires_at INTEGER     NOT NULL
+    expires_at INTEGER     NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );

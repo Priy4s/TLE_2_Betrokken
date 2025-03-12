@@ -18,6 +18,10 @@ const Key = sequelize.define(
         expires_at: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     }, {
         tableName: 'keys'
