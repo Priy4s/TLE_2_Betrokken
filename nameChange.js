@@ -5,7 +5,7 @@ const directory = './videos';
 
 fs.readdir(directory, (err, files) => {
     if(err) {
-        console.log("Fout bij het lezen van het directory", err)
+        console.log("Error with reading directory", err)
         return;
     }
 
