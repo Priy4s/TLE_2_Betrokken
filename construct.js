@@ -33,6 +33,18 @@ try {
 
     for (const facialExpression of facial_expressions) {
 
+        //Prevent duplicate records by checking if one already exists
+        const expressionRecord = await Facial_expression.findOne({
+            where: {
+                name: facialExpression,
+                image_path: `${facialExpression.replace(/\s/g, '-')}.png`
+            }
+        })
+
+        if (expressionRecord) {
+            continue;
+        }
+
         const facial_expression = Facial_expression.build({
             name: facialExpression,
             image_path: `${facialExpression.replace(/\s/g, '-')}.png`
