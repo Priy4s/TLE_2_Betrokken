@@ -22,10 +22,6 @@ const User = sequelize.define(
         role: {
             type: DataTypes.TINYINT,
             allowNull: false,
-        },
-        preference_id: {
-            type: DataTypes.STRING,
-            allowNull: true,
         }
     },
     {
