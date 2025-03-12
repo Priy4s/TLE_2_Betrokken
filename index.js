@@ -112,6 +112,44 @@ app.use((req, res, next) => {
 
 });
 
+//Block certain routes if the user is not an admin
+app.use((req, res, next) => {
+
+    //Users should always be able to GET or see OPTIONS
+    if (req.method === 'GET' || req.method === 'OPTIONS') {
+        return next();
+    }
+
+    //Users should have full access to certain routes
+    let allowAccess = false;
+
+    switch (req.path) {
+        case '/v1/login':
+            allowAccess = true;
+            break;
+        case '/v1/register':
+            allowAccess = true;
+            break;
+    }
+
+    if (allowAccess) {
+        return next();
+    }
+
+    //Only allow admins to use all other routes
+    const postedJwt = req.header('authorization').slice(7);
+    const decodedJwt = jwt.verify(postedJwt, process.env.TOKEN_SECRET);
+
+    if (decodedJwt.role !== 42) {
+
+        res.status(403);
+        return res.json({error: 'User does not have permission to use this route'})
+    }
+
+    next();
+
+});
+
 //Add relations to models
 FacialExpression.belongsToMany(Sign, {through: Facial_expression_sign});
 Sign.belongsToMany(FacialExpression, {through: Facial_expression_sign});
