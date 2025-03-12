@@ -1,4 +1,5 @@
 import {Sequelize, DataTypes} from 'sequelize';
+import User from "./User.js";
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -21,7 +22,12 @@ const Key = sequelize.define(
         },
         user_id: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'user_id',
+            references: {
+                model: User,
+                key: 'id'
+            },
         }
     }, {
         tableName: 'keys'

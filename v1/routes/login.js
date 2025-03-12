@@ -60,7 +60,24 @@ router.post('/', async (req, res) => {
 
         }
 
-        const json_token = jwt.sign({code: req.body.code}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
+        //Check if the user has a valid api key issued to them
+        const userKeys = await user.getKeys({raw: true});
+
+        let validKey = false;
+
+        for (const userKey of userKeys) {
+            if (userKey.expires_at > Date.now() && userKey.user_id === user.id) {
+                validKey = true
+            }
+        }
+
+        if (!validKey) {
+            res.status(403);
+            return res.json({error: 'User does not have a valid API key'});
+        }
+
+
+        const json_token = jwt.sign({user_id: user.id, role: user.role}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
 
         res.status(200);
         res.json({success: true, jwt: json_token});
