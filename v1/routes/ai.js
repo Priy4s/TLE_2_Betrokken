@@ -5,14 +5,14 @@ import path from 'path';
 const router = express.Router();
 router.get('/model', (req, res) => {
     try {
-        // path naar de getrainde data
         const staticModel = fs.readFileSync('./v1/training/static_knn.json', 'utf8');
         // const motionModel = fs.readFileSync(path.join(__dirname, '../../models/motion_knn.json'), 'utf8');
-        // Versie van het ai model
+
+        // Version of the AI model
         const modelVersion = '1.0.0';
 
         res.json({
-            staticModel: JSON.parse(staticModel),  // parse it as json
+            staticModel: JSON.parse(staticModel),
             // motionModel: JSON.parse(motionModel),
             version: modelVersion
         });
