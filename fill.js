@@ -3,73 +3,11 @@ import Sign from "./v1/models/Sign.js";
 try {
     await Sign.sync({force: true});
 
-    // const signs = [{
-    //     video_path: "-",
-    //     definition: "Algemeen Vraaggebaar",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Hoe",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Hoelang",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Hoeveel",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Waarom",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Wanneer",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Wat",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Welke",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Wie",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }, {
-    //     video_path: "-",
-    //     definition: "Waar",
-    //     model_path: "-",
-    //     lesson: 1,
-    //     theme: "Vraagwoorden"
-    // }];
-
     const signs = {
         lesson: {
             1: {
                 theme: {
-                    "Vraagwoorden": ["Algemeen vraaggebaar", "Hoe", "Hoelang", "Hoeveel", "Waarom", "Wanneer", "Wat", "Welke", "Wie", "Waar"],
+                    "Vraagwoorden": ["Algemeen vraag gebaar", "Hoe", "Hoelang", "Hoeveel", "Waarom", "Wanneer", "Wat", "Welke", "Wie", "Waar"],
                     "Tijdens de les": ["Aanwezig", "Bedoeling", "Beginnen", "Boek", "Docent", "Student", "Huiswerk", "Klaar 2x", "Koffie", "Les", "Lokaal", "Makkelijk", "Meenemen", "Moelijk", "Nu", "Oefening", "Ook", "Opdracht", "Pauze", "Thee", "Thuis", "Uitleggen", "Volgende", "Voorbeeld", "Voorbereiden", "Vorige", "WC"],
 
                 }
@@ -86,7 +24,7 @@ try {
         for(const [theme, signs] of Object.entries(lessonData.theme)) {
             for(const sign of signs) {
                 const newSign = Sign.create({
-                    video_path: `/videos/${sign}.mp4`,
+                    video_path: `/videos/${sign.replace(/\s/g, '-')}.mp4`,
                     definition: sign,
                     model_path: "AI",
                     lesson: lesson,
