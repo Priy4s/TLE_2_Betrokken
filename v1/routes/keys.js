@@ -1,6 +1,7 @@
 import express from 'express';
 import Key from '../models/Key.js';
 import {v4 as uuidv4} from "uuid";
+import key from "../models/Key.js";
 
 
 const router = express.Router();
@@ -23,5 +24,36 @@ router.post('/generateApiKeys', async (req, res) => {
     }
 
 });
+
+router.delete('/:apiKey', async (req, res) => {
+    const apiKey = req.params.apiKey;
+
+    try {
+        const deleted = await Key.destroy({
+            where: {
+                api_keys: apiKey
+            },
+        });
+
+        if (deleted) {
+            return res.status(200).json({
+                success: true,
+                message: "API key deleted successfully.",
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                error: "API key not found.",
+            });
+        }
+    } catch (error) {
+        console.error("Error deleting API key:", error.message);
+        return res.status(500).json({
+            success: false,
+            error: "Couldn't delete key from database.",
+        });
+    }
+});
+
 
 export default router;
