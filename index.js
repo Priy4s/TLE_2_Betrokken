@@ -3,11 +3,13 @@ import Sequelize, {Op} from 'sequelize';
 import signsV1 from './v1/routes/signs.js';
 import Key from "./v1/models/Key.js";
 import aiV1 from './v1/routes/ai.js';
-
-
 import keysV1 from './v1/routes/keys.js';
 import loginV1 from './v1/routes/login.js';
 import registerV1 from './v1/routes/register.js';
+import expressionsV1 from "./v1/routes/facial_expressions.js";
+import Sign from "./v1/models/Sign.js";
+import FacialExpression from "./v1/models/Facial_expression.js";
+import Facial_expression_sign from "./v1/models/Facial_expression_sign.js";
 
 const app = express();
 const sequelize = new Sequelize({
@@ -95,12 +97,18 @@ app.use(async (req, res, next) => {
 });
 
 
+//Add relations to models
+FacialExpression.belongsToMany(Sign, {through: Facial_expression_sign});
+Sign.belongsToMany(FacialExpression, {through: Facial_expression_sign});
+
+
 //Routes
 app.use('/v1/signs', signsV1);
 app.use('/v1/login', loginV1);
 app.use('/v1/register', registerV1);
 app.use('/v1/keys', keysV1);
 app.use('/v1/ai', aiV1);
+app.use('/v1/expressions', expressionsV1);
 
 
 // Cronjob/Timer that deletes invalid keys.
