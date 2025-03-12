@@ -1,7 +1,6 @@
 import express from 'express';
 import Key from '../models/Key.js';
 import {v4 as uuidv4} from "uuid";
-import key from "../models/Key.js";
 
 
 const router = express.Router();
