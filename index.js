@@ -66,14 +66,11 @@ app.use((req, res, next) => {
         return next();
     }
 
-    //Skip authenticating if trying to log in, register or view profile
+    //Skip authenticating if trying to log in or view profile
     let skip = false;
 
     switch (req.path) {
         case '/v1/login':
-            skip = true;
-            break;
-        case '/v1/register':
             skip = true;
             break;
     }
@@ -86,7 +83,7 @@ app.use((req, res, next) => {
     const auth = req.header('authorization');
 
     if (!auth) {
-        res.status(401);
+        res.status(400);
         return res.json({error: 'No JWT token received. Use the authorization header and bearer schema'});
     }
 
@@ -125,9 +122,6 @@ app.use((req, res, next) => {
 
     switch (req.path) {
         case '/v1/login':
-            allowAccess = true;
-            break;
-        case '/v1/register':
             allowAccess = true;
             break;
     }
