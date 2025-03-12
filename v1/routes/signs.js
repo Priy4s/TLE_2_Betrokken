@@ -14,8 +14,10 @@ router.get('/', async (req, res) => {
         const signs = await Sign.findAll({
             attributes: [
                 'id',
+                'video_path',
                 'definition',
                 'theme',
+                'model_path',
                 'lesson'
             ]
         });
