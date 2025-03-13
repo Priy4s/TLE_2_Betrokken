@@ -17,6 +17,10 @@ const Sign = sequelize.define(
                 notEmpty: {
                     msg: 'video_path can not be empty'
                 },
+            },
+            get() {
+                const rawValue = this.getDataValue('video_path');
+                return `${process.env.HOST_ADDRESS}${process.env.EXPRESS_PORT}/videos/${rawValue}`
             }
         },
         definition: {

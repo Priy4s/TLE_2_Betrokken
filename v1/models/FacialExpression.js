@@ -17,6 +17,10 @@ const FacialExpression = sequelize.define(
                 notEmpty: {
                     msg: 'image_path can not be empty'
                 },
+            },
+            get() {
+                const rawValue = this.getDataValue('image_path');
+                return `${process.env.HOST_ADDRESS}${process.env.EXPRESS_PORT}/images/${rawValue}`
             }
         },
         name: {
