@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
         if (!user) {
 
             //Frontend should redirect to register
-            res.status(403);
+            res.status(401);
             return res.json({error: 'User has not yet registered'});
 
         }
