@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --env-file=.env --watch index.js",
-    "constructDatabase": "node construct.js"
+    "constructDatabase": "node construct.js",
+    "fillDatabase": "node fill.js",
+    "changeFileName": "node nameChange.js"
   },
   "author": "Sander Landmeter",
   "license": "ISC",
