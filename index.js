@@ -125,7 +125,7 @@ app.use((req, res, next) => {
         case '/v1/login':
             allowAccess = true;
             break;
-        case '/v1/profiles':
+        case req.path.startsWith('/v1/profiles') ? req.path : false:
             allowAccess = true;
             break;
     }

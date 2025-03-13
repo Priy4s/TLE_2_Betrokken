@@ -51,9 +51,14 @@ router.options('/', (req, res) => {
 //Only authorize admins or the user themselves to view or edit things
 router.use('/:id', (req, res, next) => {
 
+    //skip if the method was OPTIONS
+    if (req.method === 'OPTIONS') {
+        return next();
+    }
+
     const jwtInfo = jwt.verify(req.header('authorization').slice(7), process.env.TOKEN_SECRET);
 
-    if (jwtInfo.role !== 42 && req.params.id !== jwtInfo.user_id) {
+    if (jwtInfo.role !== 42 && parseInt(req.params.id) !== jwtInfo.user_id) {
         res.status(403);
         return res.json({error: "User does not have access to this user's profile"});
     }
@@ -91,13 +96,102 @@ router.get('/:id', async (req, res) => {
 
 });
 
-//Update the details of a specific user
+//Update all information about a specific user (admin only)
 router.put('/:id', async (req, res) => {
 
-    //Validate the data before doing anything with the database
-    if (!req.body.name && !req.body.code) {
+    //Check to make sure the user is an admin
+    const jwtInfo = jwt.verify(req.header('authorization').slice(7), process.env.TOKEN_SECRET);
+
+    if (jwtInfo.role !== 42) {
+        res.status(403);
+        return res.json({error: "User does not have access to this route"});
+    }
+
+    //Validate the posted information
+    const body = req.body;
+
+    //This has to be done manually because of the unique constraint on the code
+    if (!body.name) {
         res.status(400);
-        return res.json({error: 'No usable data was given, allowed fields are name and code'})
+        return res.json({error: 'name must be provided and can not be empty'});
+    }
+
+    if (!body.code) {
+        res.status(400);
+        return res.json({error: 'code must be provided and can not be empty'});
+    }
+
+    //Make sure the code is a string
+    if (!isNaN(body.code)) {
+        body.code = body.code.toString();
+    }
+
+    if (!body.role) {
+        res.status(400);
+        return res.json({error: 'role must be provided and can not be empty'});
+    }
+
+    if (body.role !== 1 && body.role !== 42) {
+        res.status(400);
+        return res.json({error: 'role must be either 1 for a normal user or 42 for an admin'});
+    }
+
+    //Make sure the user actually exists
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) {
+        res.status(404);
+        return res.json({error: 'User not found!'})
+    }
+
+    //Only check if the code is already in use if the code differs from the existing user
+    if (body.code !== user.code) {
+
+        //Try to find a user with the new code
+        const used = await User.findOne({where: {code: body.code}})
+
+        //If one is found, return a 400
+        if (used) {
+            res.status(400);
+            return res.json({error: 'Code is already in use'})
+        }
+
+    }
+
+    //Change the user's information and save it to the database
+    user.name = body.name;
+    user.code = body.code;
+    user.role = body.role;
+
+    try {
+
+        await user.save();
+
+        await user.reload({
+            include: [{
+                model: Key,
+                attributes: ['expires_at']
+            }]
+        });
+
+        res.status(200);
+        res.json({success: true, user: user});
+
+    } catch (error) {
+        res.status(500);
+        res.json({error: error.message});
+    }
+
+
+});
+
+//Change the name of a specific user
+router.patch('/:id', async (req, res) => {
+
+    //Validate the data before doing anything with the database
+    if (!req.body.name) {
+        res.status(400);
+        return res.json({error: 'Please send a new name for the user'})
     }
 
     try {
@@ -109,7 +203,6 @@ router.put('/:id', async (req, res) => {
             return res.json({error: 'User not found!'})
         }
 
-        user.code = req.body.code ?? user.code;
         user.name = req.body.name ?? user.name;
 
         await user.save();
@@ -162,8 +255,8 @@ router.delete('/:id', async (req, res) => {
 //Options for detail
 router.options('/:id', (req, res) => {
 
-    res.setHeader('Allow', "GET, PUT, DELETE, OPTIONS");
-    res.setHeader('Access-Control-Allow-Methods', "GET, PUT, DELETE, OPTIONS");
+    res.setHeader('Allow', "GET, PUT, PATCH, DELETE, OPTIONS");
+    res.setHeader('Access-Control-Allow-Methods', "GET, PUT, PATCH, DELETE, OPTIONS");
 
     res.status(204);
     res.send();
