@@ -1,10 +1,7 @@
 import { Sequelize, DataTypes } from 'sequelize';
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: `storage.sqlite`,
-    define: {
-        timestamps: false
-    }
+    storage: `storage.sqlite`
 });
 
 const FacialExpression = sequelize.define(
@@ -36,7 +33,8 @@ const FacialExpression = sequelize.define(
         }
     },
     {
-        tableName: 'facial_expressions'
+        tableName: 'facial_expressions',
+        underscored: true
     },
 );
 

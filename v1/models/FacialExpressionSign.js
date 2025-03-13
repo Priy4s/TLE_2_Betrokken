@@ -1,22 +1,18 @@
 import {Sequelize, DataTypes} from 'sequelize';
-import Facial_expression from "./Facial_expression.js";
+import Facial_expression from "./FacialExpression.js";
 import Sign from "./Sign.js";
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: `storage.sqlite`,
-    define: {
-        timestamps: false
-    }
+    storage: `storage.sqlite`
 });
 
 const FacialExpressionSign = sequelize.define(
     'FacialExpressionSign',
     {
-        FacialExpressionId: {
+        facial_expression_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            field: 'facial_expression_id',
             references: {
                 model: Facial_expression,
                 key: 'id'
@@ -30,10 +26,9 @@ const FacialExpressionSign = sequelize.define(
                 },
             }
         },
-        SignId: {
+        sign_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            field: 'sign_id',
             references: {
                 model: Sign,
                 key: 'id'
@@ -49,7 +44,8 @@ const FacialExpressionSign = sequelize.define(
         }
     },
     {
-        tableName: 'facial_expression_sign'
+        tableName: 'facial_expression_sign',
+        underscored: true
     },
 );
 

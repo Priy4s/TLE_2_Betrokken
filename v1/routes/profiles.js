@@ -58,7 +58,7 @@ router.use('/:id', (req, res, next) => {
 
     const jwtInfo = jwt.verify(req.header('authorization').slice(7), process.env.TOKEN_SECRET);
 
-    if (jwtInfo.role !== 42 && parseInt(req.params.id) !== jwtInfo.user_id) {
+    if (jwtInfo.role !== 42 && parseInt(req.params.id) !== jwtInfo.userId) {
         res.status(403);
         return res.json({error: "User does not have access to this user's profile"});
     }
@@ -203,7 +203,7 @@ router.patch('/:id', async (req, res) => {
             return res.json({error: 'User not found!'})
         }
 
-        user.name = req.body.name ?? user.name;
+        user.name = req.body.name;
 
         await user.save();
 

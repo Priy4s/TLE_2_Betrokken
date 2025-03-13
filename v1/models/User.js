@@ -2,10 +2,7 @@ import {Sequelize, DataTypes} from 'sequelize';
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: `storage.sqlite`,
-    define: {
-        timestamps: false
-    }
+    storage: `storage.sqlite`
 });
 
 const User = sequelize.define(
@@ -50,12 +47,13 @@ const User = sequelize.define(
                 notEmpty: {
                     msg: 'role can not be empty'
                 },
-                isIn: [1, 42]
+                isIn: [[1, 42]]
             }
         }
     },
     {
-        tableName: 'users'
+        tableName: 'users',
+        underscored: true
     },
 );
 

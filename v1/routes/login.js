@@ -77,10 +77,10 @@ router.post('/', async (req, res) => {
         }
 
 
-        const json_token = jwt.sign({user_id: user.id, role: user.role}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
+        const jsonToken = jwt.sign({userId: user.id, role: user.role}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
 
         res.status(200);
-        res.json({success: true, jwt: json_token});
+        res.json({success: true, jwt: jsonToken});
 
     } catch (error) {
 

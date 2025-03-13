@@ -6,10 +6,10 @@ import aiV1 from './v1/routes/ai.js';
 import keysV1 from './v1/routes/keys.js';
 import loginV1 from './v1/routes/login.js';
 import registerV1 from './v1/routes/register.js';
-import expressionsV1 from "./v1/routes/facial_expressions.js";
+import expressionsV1 from "./v1/routes/facialExpressions.js";
 import Sign from "./v1/models/Sign.js";
-import FacialExpression from "./v1/models/Facial_expression.js";
-import Facial_expression_sign from "./v1/models/Facial_expression_sign.js";
+import FacialExpression from "./v1/models/FacialExpression.js";
+import FacialExpressionSign from "./v1/models/FacialExpressionSign.js";
 import User from "./v1/models/User.js";
 import jwt from 'jsonwebtoken';
 import profilesV1 from './v1/routes/profiles.js';
@@ -149,8 +149,8 @@ app.use((req, res, next) => {
 });
 
 //Add relations to models
-FacialExpression.belongsToMany(Sign, {through: Facial_expression_sign});
-Sign.belongsToMany(FacialExpression, {through: Facial_expression_sign});
+FacialExpression.belongsToMany(Sign, {through: FacialExpressionSign});
+Sign.belongsToMany(FacialExpression, {through: FacialExpressionSign});
 User.hasMany(Key, {foreignKey: 'user_id'});
 Key.belongsTo(User, {foreignKey: 'user_id'});
 

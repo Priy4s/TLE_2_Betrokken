@@ -3,10 +3,7 @@ import User from "./User.js";
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: `storage.sqlite`,
-    define: {
-        timestamps: false
-    }
+    storage: `storage.sqlite`
 });
 
 const Key = sequelize.define(
@@ -19,14 +16,15 @@ const Key = sequelize.define(
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            field: 'user_id',
             references: {
                 model: User,
                 key: 'id'
             },
         }
-    }, {
-        tableName: 'keys'
+    },
+    {
+        tableName: 'keys',
+        underscored: true
     }
 );
 

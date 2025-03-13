@@ -1,4 +1,73 @@
 import Sign from "./v1/models/Sign.js";
+import FacialExpression from "./v1/models/FacialExpression.js";
+import User from "./v1/models/User.js";
+import Key from "./v1/models/Key.js";
+
+try {
+    //Add standard facial expressions to database
+    const facialExpressions = ['blij', 'boos', 'geen', 'vragend zonder mond', 'vragend met mond'];
+
+    for (const facialExpression of facialExpressions) {
+
+        //Prevent duplicate records by checking if one already exists
+        const expressionRecord = await FacialExpression.findOne({
+            where: {
+                name: facialExpression,
+                image_path: `${facialExpression.replace(/\s/g, '-')}.png`
+            }
+        })
+
+        if (expressionRecord) {
+            continue;
+        }
+
+        const newExpression = FacialExpression.build({
+            name: facialExpression,
+            image_path: `${facialExpression.replace(/\s/g, '-')}.png`
+        });
+
+        await newExpression.save();
+
+    }
+
+    console.log('Successfully added facial expressions to database')
+
+} catch (error) {
+    console.log({error: error.message})
+}
+
+const [user, created] = await User.findOrCreate({
+    where: {code: 'Administrator'},
+    defaults: {
+        code: 'Administrator',
+        name: 'Admin',
+        role: 42,
+    },
+});
+
+//Give the admin a semi-permanent key
+if (user) {
+
+    const key = await Key.create({
+        expires_at: 8000000000000000,
+        user_id: user.id
+    });
+
+    if (key) {
+        console.log('key successfully generated for admin');
+    } else {
+        console.log('something went wrong when generating a key for the admin');
+    }
+
+}
+
+if (created) {
+    console.log('Successfully added Admin user');
+} else if (user) {
+    console.log('Admin user already exists');
+} else {
+    console.log('Admin user had not been created and does not exist');
+}
 
 try {
     await Sign.sync({force: true});
@@ -45,7 +114,7 @@ try {
     for (const [lesson, lessonData] of Object.entries(signs.lesson)) {
         for (const [theme, signs] of Object.entries(lessonData.theme)) {
             for (const sign of signs) {
-                const newSign = Sign.create({
+                const newSign = await Sign.create({
                     video_path: `http://145.24.223.196:8008/videos/${sign.replace(/\s/g, '-')}.mp4`,
                     definition: sign,
                     model_path: "AI",
