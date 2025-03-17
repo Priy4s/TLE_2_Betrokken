@@ -12,6 +12,11 @@ import Sign from "./v1/models/Sign.js";
 import Sentence from "./v1/models/Sentence.js";
 import FacialExpression from "./v1/models/Facial_expression.js";
 import Facial_expression_sign from "./v1/models/Facial_expression_sign.js";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const sequelize = new Sequelize({
@@ -26,6 +31,8 @@ try {
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }
+
+app.use('/videos', express.static(__dirname + '/videos'))
 
 //Make sure the webservice knows what it can receive
 app.use(express.json());
@@ -114,6 +121,7 @@ app.use('/v1/register', registerV1);
 app.use('/v1/keys', keysV1);
 app.use('/v1/ai', aiV1);
 app.use('/v1/expressions', expressionsV1);
+
 
 
 // Cronjob/Timer that deletes invalid keys.
