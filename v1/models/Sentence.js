@@ -29,7 +29,4 @@ const Sentence = sequelize.define(
         tableName: 'sentences'
     }
 );
-
-Sentence.belongsToMany(Sign, {through: 'sign_sentence'});
-Sign.belongsToMany(Sentence, {through: 'sign_sentence'});
 export default Sentence;
