@@ -13,6 +13,11 @@ import FacialExpressionSign from "./v1/models/FacialExpressionSign.js";
 import User from "./v1/models/User.js";
 import jwt from 'jsonwebtoken';
 import profilesV1 from './v1/routes/profiles.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const sequelize = new Sequelize({
@@ -27,6 +32,8 @@ try {
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }
+
+app.use('/videos', express.static(__dirname + '/videos'))
 
 //Make sure the webservice knows what it can receive
 app.use(express.json());

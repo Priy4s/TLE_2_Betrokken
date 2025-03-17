@@ -7,11 +7,15 @@ const router = express.Router();
 //SSO verification middleware
 router.use(async (req, res, next) => {
 
+    //Skip verification for the options method
+    if (req.method === 'OPTIONS') {
+        return next();
+    }
+
     //Skip verification if the login uses admin credentials
     if (req.body.ssoToken === process.env.ADMIN_TOKEN && req.body.code === process.env.ADMIN_CODE) {
         return next();
     }
-
 
     try {
 
