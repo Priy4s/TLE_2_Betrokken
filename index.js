@@ -110,8 +110,18 @@ app.use(async (req, res, next) => {
 FacialExpression.belongsToMany(Sign, {through: Facial_expression_sign});
 Sign.belongsToMany(FacialExpression, {through: Facial_expression_sign});
 
-Sentence.belongsToMany(Sign, {through: 'sign_sentence'});
-Sign.belongsToMany(Sentence, {through: 'sign_sentence'});
+Sentence.belongsToMany(Sign, {
+    through: 'sentence_sign',
+    foreignKey: 'sentence_id',
+    otherKey: 'sign_id',
+    as: 'signs'
+});
+Sign.belongsToMany(Sentence, {
+    through: 'sentence_sign',
+    foreignKey: 'sign_id',
+    otherKey: 'sentence_id',
+    as: 'sentences'
+});;
 
 //Routes
 app.use('/v1/signs', signsV1);

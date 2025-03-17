@@ -47,8 +47,6 @@ router.post('/', async (req, res) => {
             return res.json({error: 'Signs not found!'})
         }
 
-        const content = signs.map(sign => sign.definition).join(' ');
-
         const [sentence, created] = await Sentence.findOrCreate({
             where: {
                 video_path: video_path,
