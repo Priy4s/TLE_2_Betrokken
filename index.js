@@ -15,6 +15,7 @@ import jwt from 'jsonwebtoken';
 import profilesV1 from './v1/routes/profiles.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import log from "./logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -156,6 +157,17 @@ app.use((req, res, next) => {
 
 });
 
+//Error handler
+function errorHandler (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500);
+
+    //Save the request to a log file
+    log(req, res, err);
+
+    return res.json({error: 'Internal server error'});
+}
+
 //Add relations to models
 FacialExpression.belongsToMany(Sign, {through: FacialExpressionSign});
 Sign.belongsToMany(FacialExpression, {through: FacialExpressionSign});
@@ -172,6 +184,8 @@ app.use('/v1/ai', aiV1);
 app.use('/v1/expressions', expressionsV1);
 app.use('/v1/profiles', profilesV1);
 
+//Register the error handler last, otherwise it won't work
+app.use(errorHandler);
 
 // Cronjob/Timer that deletes invalid keys.
 setInterval(async () => {
