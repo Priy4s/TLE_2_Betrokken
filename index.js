@@ -121,7 +121,7 @@ Sign.belongsToMany(Sentence, {
     foreignKey: 'sign_id',
     otherKey: 'sentence_id',
     as: 'sentences'
-});;
+});
 
 //Routes
 app.use('/v1/signs', signsV1);

@@ -36,10 +36,22 @@ router.post('/', async (req, res) => {
     const { sign_ids, video_path, definition, model_path } = req.body;
 
     try {
+
+        if (!sign_ids || !video_path || !definition || !model_path) {
+            res.status(400);
+            return res.json({error: 'Please send an object with the following properties: sign_ids, video_path, definition, model_path'})
+        }
+
+        if (!Array.isArray(sign_ids) || sign_ids.length === 0) {
+            res.status(400);
+            return res.json({error: 'Signs not found or incorrect!'})
+        }
+
         const signs = await Sign.findAll({
             where: {
                 id: sign_ids
-            }
+            },
+            attributes: ['id', 'definition', 'video_path']
         });
 
         if (signs.length !== sign_ids.length) {
@@ -49,14 +61,10 @@ router.post('/', async (req, res) => {
 
         const [sentence, created] = await Sentence.findOrCreate({
             where: {
-                video_path: video_path,
-                definition: definition,
-                model_path: model_path,
+                definition
             },
             defaults: {
-                video_path: video_path,
-                definition: definition,
-                model_path: model_path,
+                video_path, definition, model_path,
             }
         });
 
