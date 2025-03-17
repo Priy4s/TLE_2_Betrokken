@@ -1,6 +1,15 @@
 import express from 'express';
 import Sentence from '../models/Sentence.js';
 import Sign from '../models/Sign.js';
+import { Sequelize } from "sequelize";
+
+const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: `storage.sqlite`,
+    define: {
+        timestamps: false
+    }
+})
 
 const router = express.Router();
 
@@ -27,6 +36,7 @@ router.get('/', async (req, res) => {
             })));
         res.json(sentences);
     } catch (error) {
+        console.log(error.message)
         res.status(500);
         res.json({error: error.message});
     }
@@ -68,22 +78,43 @@ router.post('/', async (req, res) => {
             }
         });
 
+        const sentenceSignEntries = sign_ids.map((sign_id, index) => ({
+            sentence_id: sentence.id,
+            sign_id: sign_id,
+            sequence_position: index + 1, // Assign sequential position
+        }));
+
+        // Insert into junction table
+        await sequelize.getQueryInterface().bulkInsert('sentence_sign', sentenceSignEntries);
+
+        const updatedSentence = await Sentence.findByPk(
+            sentence.id,
+            {
+                include: {
+                    model: Sign,
+                    as: 'signs',
+                    through: {attributes: ['sequence_position']}}
+            }
+        )
+
         await sentence.addSigns(signs);
 
         res.status(201).json({
             message: created ? 'Sentence created!' : 'Sentence already exists!',
             sentence: {
-                id: sentence.id,
-                video_path: sentence.video_path,
-                definition: sentence.definition,
-                model_path: sentence.model_path,
-                signs: sentence.signs.map(sign => ({
+                id: updatedSentence.id,
+                video_path: updatedSentence.video_path,
+                definition: updatedSentence.definition,
+                model_path: updatedSentence.model_path,
+                signs: updatedSentence.signs.map(sign => ({
                     id: sign.id,
                     definition: sign.definition,
                     video_path: sign.video_path,
+                    sequence_position: sign.sentence_sign?.sequence_position,
                 }))}
         });
     } catch (error) {
+        console.log(error.message)
         res.status(500);
         res.json({error: error.message});
     }
