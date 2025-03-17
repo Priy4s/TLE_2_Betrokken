@@ -119,10 +119,18 @@ try {
     for (const [lesson, lessonData] of Object.entries(signs.lesson)) {
         for (const [theme, signs] of Object.entries(lessonData.theme)) {
             for (const sign of signs) {
+                let modelPath = "AI";
+
+                if (theme === "Alfabet") {
+                    const motionLetters = ["H", "J", "U", "X", "Z"];
+                    modelPath = motionLetters.includes(sign) ? "Motion" : "Static";
+                    console.log(sign)
+                }
+
                 const newSign = await Sign.create({
                     video_path: `${sign.replace(/\s/g, '-')}.mp4`,
                     definition: sign,
-                    model_path: "AI",
+                    model_path: modelPath,
                     lesson: lesson,
                     theme: theme
                 });
