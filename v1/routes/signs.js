@@ -1,8 +1,7 @@
 import express from 'express';
 import Sign from '../models/Sign.js';
-import facial_expression from "../models/Facial_expression.js";
-import FacialExpression from "../models/Facial_expression.js";
-import Facial_expression_sign from "../models/Facial_expression_sign.js";
+import FacialExpression from "../models/FacialExpression.js";
+import FacialExpressionSign from "../models/FacialExpressionSign.js";
 
 const router = express.Router();
 
@@ -12,12 +11,10 @@ router.get('/', async (req, res) => {
     try {
 
         const signs = await Sign.findAll({
-            attributes: [
-                'id',
-                'definition',
-                'theme',
-                'lesson'
-            ]
+            include: [{
+                model: FacialExpression,
+                through: {attributes: []}
+            }]
         });
 
         res.status(200);
@@ -108,7 +105,7 @@ router.post('/', async (req, res) => {
 
         await sign.reload({
             include: [{
-                model: facial_expression,
+                model: FacialExpression,
                 through: {attributes: []}
             }]
         });
@@ -144,7 +141,7 @@ router.get('/:id', async (req, res) => {
 
         const sign = await Sign.findByPk(req.params.id, {
             include: [{
-                model: facial_expression,
+                model: FacialExpression,
                 through: {attributes: []}
             }]
         });
@@ -244,7 +241,7 @@ router.put('/:id', async (req, res) => {
         //Only update the expressions if they got sent in with the request
         if (postedExpressions !== []) {
 
-            const expressionRecords = await Facial_expression_sign.findAll({
+            const expressionRecords = await FacialExpressionSign.findAll({
                 where: {sign_id: sign.id},
                 attributes: ['facial_expression_id']
             });
@@ -281,7 +278,7 @@ router.put('/:id', async (req, res) => {
         //Reload the sign from the database so we can also return the facial expressions
         await sign.reload({
             include: [{
-                model: facial_expression,
+                model: FacialExpression,
                 through: {attributes: []}
             }]
         });

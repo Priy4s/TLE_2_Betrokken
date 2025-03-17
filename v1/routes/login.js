@@ -7,11 +7,15 @@ const router = express.Router();
 //SSO verification middleware
 router.use(async (req, res, next) => {
 
+    //Skip verification for the options method
+    if (req.method === 'OPTIONS') {
+        return next();
+    }
+
     //Skip verification if the login uses admin credentials
     if (req.body.ssoToken === process.env.ADMIN_TOKEN && req.body.code === process.env.ADMIN_CODE) {
         return next();
     }
-
 
     try {
 
@@ -55,15 +59,32 @@ router.post('/', async (req, res) => {
         if (!user) {
 
             //Frontend should redirect to register
-            res.status(403);
+            res.status(401);
             return res.json({error: 'User has not yet registered'});
 
         }
 
-        const json_token = jwt.sign({code: req.body.code}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
+        //Check if the user has a valid api key issued to them
+        const userKeys = await user.getKeys({raw: true});
+
+        let validKey = false;
+
+        for (const userKey of userKeys) {
+            if (userKey.expires_at > Date.now() && userKey.user_id === user.id) {
+                validKey = true
+            }
+        }
+
+        if (!validKey) {
+            res.status(403);
+            return res.json({error: 'User does not have a valid API key'});
+        }
+
+
+        const jsonToken = jwt.sign({userId: user.id, role: user.role}, process.env.TOKEN_SECRET, {expiresIn: '6h'});
 
         res.status(200);
-        res.json({success: true, jwt: json_token});
+        res.json({success: true, jwt: jsonToken});
 
     } catch (error) {
 

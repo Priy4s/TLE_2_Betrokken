@@ -1,9 +1,3 @@
-CREATE TABLE preferences
-(
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    allow_choice BOOLEAN NOT NULL,
-    show_all     BOOLEAN NOT NULL
-);
 CREATE TABLE dance_progress
 (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,9 +13,7 @@ CREATE TABLE users
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     name          TEXT        NOT NULL,
     code          TEXT UNIQUE NOT NULL,
-    preference_id INTEGER,
-    role          INTEGER     NOT NULL,
-    FOREIGN KEY (preference_id) REFERENCES preferences (id)
+    role          INTEGER     NOT NULL
 );
 CREATE TABLE signs
 (
@@ -122,6 +114,7 @@ CREATE TABLE facial_expression_sign
 CREATE TABLE keys
 (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    api_keys   TEXT UNIQUE NOT NULL,
-    expires_at INTEGER     NOT NULL
+    user_id    INTEGER     NOT NULL,
+    expires_at INTEGER     NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );

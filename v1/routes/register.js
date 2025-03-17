@@ -1,66 +1,86 @@
 import express from 'express';
 import User from '../models/User.js';
+import Key from "../models/Key.js";
+import {BaseError} from "sequelize";
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
 
     //Make sure the client actually sent something we can use
-    const postedUser = req.body;
+    const postedUsers = req.body;
 
-    if (!postedUser.ssoToken || !postedUser.name || !postedUser.code) {
+    //Check if an array was sent
+    if (!Array.isArray(postedUsers)) {
         res.status(400);
-        return res.json({error: 'Please send an object with the following properties: ssoToken, name, code'})
+        return res.json({error: 'Please send an array of objects containing a name and code property'});
     }
 
-    //Check if the SSO token is valid
-    try {
+    const failedRequests = [];
+    const errors = [];
 
-        const response = await fetch("https://cmgt.hr.nl/api/validate-sso-token", {
-            method: "GET",
-            headers: {
-                "Token": req.body.ssoToken,
-            },
-        });
+    for (const postedUser of postedUsers) {
 
-        if (!response.ok) {
-            res.status(401);
-            return res.json({error: 'Token has expired or is incorrect'})
+        if (!postedUser.name || !postedUser.code) {
+
+            failedRequests.push(postedUser);
+
+            errors.push({message: 'User must have a name and code, and neither can be empty'});
+
+            continue;
         }
 
+        try {
 
-    } catch (error) {
+            //Add the user if they didn't already exist
+            const [user, created] = await User.findOrCreate({
+                where: {code: postedUser.code},
+                defaults: {
+                    name: postedUser.name,
+                    role: 1,
+                }
+            });
 
-        console.error(error.message);
-        res.status(500);
-        return res.json({error: 'Something went wrong in the server.'})
+            await user.reload();
 
-    }
+            //Give them a new API key
+            const expiresAt = Date.now() + 60 * 60 * 730000 * 6;
 
-    //Add the user to the database if they didn't already exist
-    try {
+            await Key.create({
+                expires_at: expiresAt,
+                user_id: user.id
+            });
 
-        const [user, created] = await User.findOrCreate({
-            where: {code: postedUser.code},
-            defaults: {
-                name: postedUser.name,
-                role: 1,
-            }
-        });
+        } catch (error) {
 
-        //If the user already exists, send a 400 error
-        if (!created) {
-            res.status(400);
-            return res.json({success: false, error: 'A user with that code already exists'});
+            failedRequests.push(postedUser);
+            errors.push(error);
+
         }
 
-        res.status(201);
-        res.json({success: true, user: user});
-
-    } catch (error) {
-        res.status(500);
-        res.json({error: 'Something went wrong on the server, please try again'});
     }
+
+
+    let status = 201;
+    let success = true;
+
+    if (errors.length > 0) {
+
+        status = 400;
+
+        if (postedUsers.length === failedRequests.length) {
+            success = false;
+        }
+
+        if (errors.some(error => error instanceof BaseError)) {
+            status = 500;
+        }
+
+    }
+
+
+    res.status(status);
+    return res.json({partialSuccess: success, failedRequests: failedRequests, errors: errors});
 
 
 });

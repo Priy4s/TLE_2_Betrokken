@@ -1,7 +1,10 @@
 import Sequelize from 'sequelize';
 import fs from 'fs';
-import Facial_expression from "./v1/models/Facial_expression.js";
+import FacialExpression from "./v1/models/FacialExpression.js";
 import User from './v1/models/User.js';
+import Key from "./v1/models/Key.js";
+import Sign from "./v1/models/Sign.js";
+import FacialExpressionSign from "./v1/models/FacialExpressionSign.js";
 
 const sql_file_content = fs.readFileSync('./database_frame.sql', 'utf8');
 
@@ -18,7 +21,7 @@ try {
 
         try {
 
-        await sequelize.query(query);
+            await sequelize.query(query);
 
         } catch (error) {
             console.log(error.message)
@@ -28,38 +31,22 @@ try {
 
     console.log('Successfully constructed the database')
 
-    //Add standard facial expressions to database
-    const facial_expressions = ['blij', 'boos', 'geen', 'vragend zonder mond', 'vragend met mond'];
-
-    for (const facialExpression of facial_expressions) {
-
-        const facial_expression = Facial_expression.build({
-            name: facialExpression,
-            image_path: `${facialExpression.replace(/\s/g, '-')}.png`
-        });
-
-        await facial_expression.save();
-
-    }
-
-
 } catch (error) {
     console.log(error.message)
 }
 
-const [user, created] = await User.findOrCreate({
-    where: { code: 'Administrator'},
-    defaults: {
-        code: 'Administrator',
-        name: 'Admin',
-        role: 42,
-    },
-});
+//Sync some tables for fun
+try {
 
-if (created) {
-    console.log('Successfully added Admin user')
-} else if (user) {
-    console.log('Admin user already exists')
-} else {
-    console.log('Admin user had not been created and does not exist')
+    await User.sync({force: true});
+    await Sign.sync({force: true});
+    await Key.sync({force: true});
+    await FacialExpression.sync({force: true});
+    await FacialExpressionSign.sync({force: true});
+
+    console.log('Successfully synced stuff')
+
+} catch (error) {
+    console.log({error: error.message});
 }
+

@@ -1,5 +1,5 @@
 import express from 'express';
-import FacialExpression from '../models/Facial_expression.js';
+import FacialExpression from '../models/FacialExpression.js';
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
 
     try {
 
-        const facial_expressions = await FacialExpression.findAll({
+        const facialExpressions = await FacialExpression.findAll({
             attributes: [
                 'id',
                 'name',
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
         });
 
         res.status(200);
-        res.json(facial_expressions);
+        res.json(facialExpressions);
 
     } catch (error) {
 
