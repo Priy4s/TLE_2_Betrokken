@@ -53,7 +53,16 @@ router.post('/', async (req, res) => {
         });
 
         await sentence.add(signs);
-        res.status(200).json(sentence);
+        res.status(201).json({
+            message: created ? 'Sentence created!' : 'Sentence already exists!',
+            sentence: {
+                id: sentence.id,
+                content: sentence.content,
+                signs: sentence.signs.map(sign => ({
+                    id: sign.id,
+                    definition: sign.definition,
+                }))}
+        });
     } catch (error) {
         res.status(500);
         res.json({error: error.message});
