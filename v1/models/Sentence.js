@@ -1,5 +1,4 @@
 import { Sequelize, DataTypes } from "sequelize";
-import Sign from "./Sign.js";
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
