@@ -22,18 +22,23 @@ try {
                     "Werkwoorden":
                         ["Antwoorden", "Doen", "Geven", "Hebben", "Helpen", "Kijken", "Kunnen", "Leren", "Lezen", "Vergeten", "Oefenen", "Onthouden", "Opruimen", "Vertellen", "Proberen", "Schrijven", "Willen", "Zeggen", "Zitten", "Vragen"],
                     "Luisterhouding":
-                        ["Bedankt", "Ik begrijp het", "Ik begrijp het niet", "Jammer", "Klopt", "Klopt niet", "Leuk", "Opnieuw", "Sorry", "Spannend", "Vervelend", "Vreselijk"],
+                        ["Alsjeblieft (iets geven)", "Alsjeblieft (verzoek)", "Bedankt", "Ik begrijp het", "Ik begrijp het niet", "Jammer", "Klopt", "Klopt niet", "Leuk", "Opnieuw", "Sorry", "Spannend", "Vervelend", "Vreselijk"],
                     "Gevoelens":
                         ["Bang", "Blij", "Boos", "Opgelucht", "Verdrietig", "Zenuwachtig"],
                     "Tellen":
                         ["0 tot 12"]
                 }
             },
-            // 3: {
-            //     theme: {
-            //
-            //     }
-            // },
+            3: {
+                theme: {
+                    "Dagen & maanden overig" :
+                        ["Ochtend", "Middag", "Avond", "Nacht", "Vanochtend", "Vanmiddag", "Vanavond", "Vannacht"],
+                    "Maanden" :
+                        ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"],
+                    "Dagen" :
+                        ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag", "Dag", "Maand", "Week", "Weekend", "Jaar"],
+                }
+            },
             5: {
                 theme: {
                     "Alfabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
