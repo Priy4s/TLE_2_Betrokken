@@ -37,8 +37,6 @@ try {
                         ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"],
                     "Dagen" :
                         ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag", "Dag", "Maand", "Week", "Weekend", "Jaar"],
-                    "Afspraken maken" :
-                        [],
                 }
             },
             5: {
