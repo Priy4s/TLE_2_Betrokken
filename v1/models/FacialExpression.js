@@ -20,7 +20,7 @@ const FacialExpression = sequelize.define(
             },
             get() {
                 const rawValue = this.getDataValue('image_path');
-                return `${process.env.HOST_ADDRESS}${process.env.EXPRESS_PORT}/images/${rawValue}`
+                return `${process.env.HOST_ADDRESS}${process.env.EXPRESS_PORT}/images/facialExpressions/${rawValue}`
             }
         },
         name: {

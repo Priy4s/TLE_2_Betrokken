@@ -33,7 +33,8 @@ try {
     console.error('Unable to connect to the database:', error);
 }
 
-app.use('/videos', express.static(__dirname + '/videos'))
+app.use('/videos', express.static(__dirname + '/videos'));
+app.use('/images', express.static(__dirname + '/images'));
 
 //Make sure the webservice knows what it can receive
 app.use(express.json());
