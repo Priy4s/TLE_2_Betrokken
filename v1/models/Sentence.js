@@ -11,17 +11,33 @@ const sequelize = new Sequelize({
 const Sentence = sequelize.define(
     'Sentence',
     {
-        content: {
+        video_path: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: {
-                    msg: 'sentence must be provided'
+                    msg: 'video_path must be provided'
                 },
                 notEmpty: {
-                    msg: 'sentence can not be empty'
-                },
+                    msg: 'video_path cannot be empty'
+                }
             }
+        },
+        definition: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'definition must be provided'
+                },
+                notEmpty: {
+                    msg: 'definition cannot be empty'
+                }
+            }
+        },
+        model_path: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }
     , {

@@ -9,12 +9,15 @@ router.get('/', async (req, res) => {
         const sentences = await Sentence.findAll({
             include: {
                 model: Sign,
+                as: 'signs',
                 through: {attributes: []}}
         });
         res.status(200).json(sentences.map(sentence =>
             ({
                 id: sentence.id,
-                content: sentence.content,
+                video_path: sentence.video_path,
+                definition: sentence.definition,
+                model_path: sentence.model_path,
                 signs: sentence.signs.map(sign => ({
                     id: sign.id,
 
@@ -30,7 +33,7 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const { sign_ids } = req.body;
+    const { sign_ids, video_path, definition, model_path } = req.body;
 
     try {
         const signs = await Sign.findAll({
@@ -48,19 +51,30 @@ router.post('/', async (req, res) => {
 
         const [sentence, created] = await Sentence.findOrCreate({
             where: {
-                content: content
+                video_path: video_path,
+                definition: definition,
+                model_path: model_path,
+            },
+            defaults: {
+                video_path: video_path,
+                definition: definition,
+                model_path: model_path,
             }
         });
 
-        await sentence.add(signs);
+        await sentence.addSigns(signs);
+
         res.status(201).json({
             message: created ? 'Sentence created!' : 'Sentence already exists!',
             sentence: {
                 id: sentence.id,
-                content: sentence.content,
+                video_path: sentence.video_path,
+                definition: sentence.definition,
+                model_path: sentence.model_path,
                 signs: sentence.signs.map(sign => ({
                     id: sign.id,
                     definition: sign.definition,
+                    video_path: sign.video_path,
                 }))}
         });
     } catch (error) {
@@ -74,6 +88,7 @@ router.get('/:id', async (req, res) => {
         const sentence = await Sentence.findByPk(req.params.id, {
             include: {
                 model: Sign,
+                as: 'signs',
                 through: {attributes: []}}
         });
 
@@ -83,7 +98,9 @@ router.get('/:id', async (req, res) => {
         }
         res.status(200).json({
             id: sentence.id,
-            content: sentence.content,
+            video_path: sentence.video_path,
+            definition: sentence.definition,
+            model_path: sentence.model_path,
             signs: sentence.signs.map(sign => ({
                 id: sign.id,
 
