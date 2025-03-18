@@ -41,13 +41,13 @@ router.post('/generateApiKeys', async (req, res) => {
 
 });
 
-router.delete('/:apiKey', async (req, res) => {
-    const apiKey = req.params.apiKey;
+router.delete('/:keyId', async (req, res) => {
+    const apiKey = req.params.keyId;
 
     try {
         const deleted = await Key.destroy({
             where: {
-                api_keys: apiKey
+                id: apiKey
             },
         });
 
