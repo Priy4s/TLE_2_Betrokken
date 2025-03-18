@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 const router = express.Router();
-router.get('/model', (req, res) => {
+router.get('/model', (req, res, next) => {
     try {
         const staticModel = fs.readFileSync('./v1/training/static_knn.json', 'utf8');
         // const motionModel = fs.readFileSync(path.join(__dirname, '../../models/motion_knn.json'), 'utf8');
@@ -18,8 +18,7 @@ router.get('/model', (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error reading model files:", error);
-        res.status(500).json({ error: 'Failed to load the AI models.' });
+        next(error);
     }
 });
 

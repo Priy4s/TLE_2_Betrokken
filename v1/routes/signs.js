@@ -1,25 +1,20 @@
 import express from 'express';
 import Sign from '../models/Sign.js';
-import facial_expression from "../models/Facial_expression.js";
-import FacialExpression from "../models/Facial_expression.js";
-import Facial_expression_sign from "../models/Facial_expression_sign.js";
+import FacialExpression from "../models/FacialExpression.js";
+import FacialExpressionSign from "../models/FacialExpressionSign.js";
 
 const router = express.Router();
 
 //Get the full list of signs
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
 
     try {
 
         const signs = await Sign.findAll({
-            attributes: [
-                'id',
-                'video_path',
-                'definition',
-                'theme',
-                'model_path',
-                'lesson'
-            ]
+            include: [{
+                model: FacialExpression,
+                through: {attributes: []}
+            }]
         });
 
         res.status(200);
@@ -27,15 +22,14 @@ router.get('/', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Create a new sign
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
 
     //Build a model based on the req.body so we can validate its contents
     const sign = Sign.build(req.body);
@@ -110,15 +104,14 @@ router.post('/', async (req, res) => {
 
         await sign.reload({
             include: [{
-                model: facial_expression,
+                model: FacialExpression,
                 through: {attributes: []}
             }]
         });
 
     } catch (error) {
 
-        res.status(500);
-        return res.json({error: 'Something went wrong on the server, please try again'});
+        next(error);
 
     }
 
@@ -140,13 +133,13 @@ router.options('/', (req, res) => {
 });
 
 //Get the details of a specific sign
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
 
     try {
 
         const sign = await Sign.findByPk(req.params.id, {
             include: [{
-                model: facial_expression,
+                model: FacialExpression,
                 through: {attributes: []}
             }]
         });
@@ -161,15 +154,14 @@ router.get('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Update the details of a specific sign
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
 
     //Build a model based on the req.body so we can validate its contents
     const postedSign = Sign.build(req.body);
@@ -246,7 +238,7 @@ router.put('/:id', async (req, res) => {
         //Only update the expressions if they got sent in with the request
         if (postedExpressions !== []) {
 
-            const expressionRecords = await Facial_expression_sign.findAll({
+            const expressionRecords = await FacialExpressionSign.findAll({
                 where: {sign_id: sign.id},
                 attributes: ['facial_expression_id']
             });
@@ -283,7 +275,7 @@ router.put('/:id', async (req, res) => {
         //Reload the sign from the database so we can also return the facial expressions
         await sign.reload({
             include: [{
-                model: facial_expression,
+                model: FacialExpression,
                 through: {attributes: []}
             }]
         });
@@ -293,15 +285,14 @@ router.put('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Delete a specific sign
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
 
     try {
 
@@ -319,8 +310,7 @@ router.delete('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 

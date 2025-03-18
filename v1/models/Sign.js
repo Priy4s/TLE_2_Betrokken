@@ -1,10 +1,7 @@
 import { Sequelize, DataTypes } from 'sequelize';
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: `storage.sqlite`,
-    define: {
-        timestamps: false
-    }
+    storage: `storage.sqlite`
 });
 
 const Sign = sequelize.define(
@@ -20,6 +17,10 @@ const Sign = sequelize.define(
                 notEmpty: {
                     msg: 'video_path can not be empty'
                 },
+            },
+            get() {
+                const rawValue = this.getDataValue('video_path');
+                return `${process.env.HOST_ADDRESS}${process.env.EXPRESS_PORT}/videos/${rawValue}`
             }
         },
         definition: {
@@ -75,7 +76,8 @@ const Sign = sequelize.define(
         },
     },
     {
-        tableName: 'signs'
+        tableName: 'signs',
+        underscored: true
     },
 );
 
