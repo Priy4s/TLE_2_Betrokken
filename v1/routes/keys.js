@@ -6,7 +6,7 @@ import User from "../models/User.js";
 const router = express.Router();
 
 
-router.post('/generateApiKeys', async (req, res) => {
+router.post('/generateApiKeys', async (req, res, next) => {
 
     //When making a new API key, a user's code must be given in the body
     if (!req.body.userCode) {
@@ -35,8 +35,8 @@ router.post('/generateApiKeys', async (req, res) => {
 
         return res.status(201).json({keyId: key.id, expiresAt: new Date(expiresAt).toISOString()});
 
-    } catch {
-        return res.status(500).json({error: "Couldn't push into database"})
+    } catch(error) {
+        next(error);
     }
 
 });

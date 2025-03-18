@@ -3,3 +3,5 @@
 storage.sqlite
 node_modules
 package-lock.json
+logs/*
+!logs/.gitkeep

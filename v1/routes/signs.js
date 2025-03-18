@@ -6,7 +6,7 @@ import FacialExpressionSign from "../models/FacialExpressionSign.js";
 const router = express.Router();
 
 //Get the full list of signs
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
 
     try {
 
@@ -22,15 +22,14 @@ router.get('/', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Create a new sign
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
 
     //Build a model based on the req.body so we can validate its contents
     const sign = Sign.build(req.body);
@@ -112,8 +111,7 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        return res.json({error: 'Something went wrong on the server, please try again'});
+        next(error);
 
     }
 
@@ -135,7 +133,7 @@ router.options('/', (req, res) => {
 });
 
 //Get the details of a specific sign
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
 
     try {
 
@@ -156,15 +154,14 @@ router.get('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Update the details of a specific sign
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
 
     //Build a model based on the req.body so we can validate its contents
     const postedSign = Sign.build(req.body);
@@ -288,15 +285,14 @@ router.put('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Delete a specific sign
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
 
     try {
 
@@ -314,8 +310,7 @@ router.delete('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 

@@ -1,20 +1,40 @@
 import express from 'express';
 import Sequelize, {Op} from 'sequelize';
+
+//v1
 import signsV1 from './v1/routes/signs.js';
-import Key from "./v1/models/Key.js";
+import KeyV1 from "./v1/models/Key.js";
 import aiV1 from './v1/routes/ai.js';
 import keysV1 from './v1/routes/keys.js';
 import loginV1 from './v1/routes/login.js';
 import registerV1 from './v1/routes/register.js';
 import expressionsV1 from "./v1/routes/facialExpressions.js";
-import Sign from "./v1/models/Sign.js";
-import FacialExpression from "./v1/models/FacialExpression.js";
-import FacialExpressionSign from "./v1/models/FacialExpressionSign.js";
-import User from "./v1/models/User.js";
-import jwt from 'jsonwebtoken';
+import SignV1 from "./v1/models/Sign.js";
+import FacialExpressionV1 from "./v1/models/FacialExpression.js";
+import FacialExpressionSignV1 from "./v1/models/FacialExpressionSign.js";
 import profilesV1 from './v1/routes/profiles.js';
+import UserV1 from "./v1/models/User.js";
+
+
+//v2
+import signsV2 from './v2/routes/signs.js';
+import KeyV2 from "./v2/models/Key.js";
+import aiV2 from './v2/routes/ai.js';
+import keysV2 from './v2/routes/keys.js';
+import loginV2 from './v2/routes/login.js';
+import registerV2 from './v2/routes/register.js';
+import expressionsV2 from "./v2/routes/facialExpressions.js";
+import profilesV2 from './v2/routes/profiles.js';
+import SignV2 from "./v2/models/Sign.js";
+import FacialExpressionV2 from "./v2/models/FacialExpression.js";
+import FacialExpressionSignV2 from "./v2/models/FacialExpressionSign.js";
+import UserV2 from "./v2/models/User.js";
+
+
+import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import log from "./logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -82,6 +102,10 @@ app.use((req, res, next) => {
         case '/v1/login':
             skip = true;
             break;
+
+        case '/v2/login':
+            skip = true;
+            break;
     }
 
     if (skip) {
@@ -133,7 +157,13 @@ app.use((req, res, next) => {
         case '/v1/login':
             allowAccess = true;
             break;
+        case '/v2/login':
+            allowAccess = true;
+            break;
         case req.path.startsWith('/v1/profiles') ? req.path : false:
+            allowAccess = true;
+            break;
+        case req.path.startsWith('/v2/profiles') ? req.path : false:
             allowAccess = true;
             break;
     }
@@ -156,14 +186,31 @@ app.use((req, res, next) => {
 
 });
 
+//Error handler
+function errorHandler (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500);
+
+    //Save the request to a log file
+    log(req, res, err);
+
+    return res.json({error: 'Internal server error'});
+}
+
 //Add relations to models
-FacialExpression.belongsToMany(Sign, {through: FacialExpressionSign});
-Sign.belongsToMany(FacialExpression, {through: FacialExpressionSign});
-User.hasMany(Key, {foreignKey: 'user_id'});
-Key.belongsTo(User, {foreignKey: 'user_id'});
+FacialExpressionV1.belongsToMany(SignV1, {through: FacialExpressionSignV1});
+SignV1.belongsToMany(FacialExpressionV1, {through: FacialExpressionSignV1});
+UserV1.hasMany(KeyV1, {foreignKey: 'user_id'});
+KeyV1.belongsTo(UserV1, {foreignKey: 'user_id'});
+
+//V2
+FacialExpressionV2.belongsToMany(SignV2, {through: FacialExpressionSignV2});
+SignV2.belongsToMany(FacialExpressionV2, {through: FacialExpressionSignV2});
+UserV2.hasMany(KeyV2, {foreignKey: 'user_id'});
+KeyV1.belongsTo(UserV2, {foreignKey: 'user_id'});
 
 
-//Routes
+//Routes v1
 app.use('/v1/signs', signsV1);
 app.use('/v1/login', loginV1);
 app.use('/v1/register', registerV1);
@@ -172,13 +219,24 @@ app.use('/v1/ai', aiV1);
 app.use('/v1/expressions', expressionsV1);
 app.use('/v1/profiles', profilesV1);
 
+//Routes v2
+app.use('/v2/signs', signsV2);
+app.use('/v2/login', loginV2);
+app.use('/v2/register', registerV2);
+app.use('/v2/keys', keysV2);
+app.use('/v2/ai', aiV2);
+app.use('/v2/expressions', expressionsV2);
+app.use('/v2/profiles', profilesV2);
+
+//Register the error handler last, otherwise it won't work
+app.use(errorHandler);
 
 // Cronjob/Timer that deletes invalid keys.
 setInterval(async () => {
 
     try {
 
-        await Key.destroy({
+        await KeyV1.destroy({
             where: {
                 expires_at: {
                     [Op.lte]: Date.now()

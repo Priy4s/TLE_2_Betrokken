@@ -6,7 +6,7 @@ import Key from "../models/Key.js";
 const router = express.Router();
 
 //Get the full list of users (admin only)
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
 
     const jwtInfo = jwt.verify(req.header('authorization').slice(7), process.env.TOKEN_SECRET);
 
@@ -29,8 +29,7 @@ router.get('/', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
@@ -68,7 +67,7 @@ router.use('/:id', (req, res, next) => {
 });
 
 //Get the details of a specific user
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
 
     try {
 
@@ -89,15 +88,14 @@ router.get('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Update all information about a specific user (admin only)
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
 
     //Check to make sure the user is an admin
     const jwtInfo = jwt.verify(req.header('authorization').slice(7), process.env.TOKEN_SECRET);
@@ -178,15 +176,14 @@ router.put('/:id', async (req, res) => {
         res.json({success: true, user: user});
 
     } catch (error) {
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
     }
 
 
 });
 
 //Change the name of a specific user
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', async (req, res, next) => {
 
     //Validate the data before doing anything with the database
     if (!req.body.name) {
@@ -219,15 +216,14 @@ router.patch('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
 });
 
 //Delete a specific user
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
 
     try {
 
@@ -245,8 +241,7 @@ router.delete('/:id', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 

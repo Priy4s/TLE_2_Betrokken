@@ -34,9 +34,7 @@ router.use(async (req, res, next) => {
 
     } catch (error) {
 
-        console.error(error.message);
-        res.status(500);
-        return res.json({error: 'Something went wrong in the server.'})
+        next(error);
 
     }
 
@@ -45,7 +43,7 @@ router.use(async (req, res, next) => {
 
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
 
     if (!req.body.code || !req.body.ssoToken) {
         res.status(400);
@@ -88,8 +86,7 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
 
-        res.status(500);
-        res.json({error: error.message});
+        next(error);
 
     }
 
