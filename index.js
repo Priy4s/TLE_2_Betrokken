@@ -19,6 +19,7 @@ import SentenceV1 from "./v1/models/Sentence.js";
 
 //v2
 import signsV2 from './v2/routes/signs.js';
+import sentencesV2 from './v2/routes/sentences.js';
 import KeyV2 from "./v2/models/Key.js";
 import aiV2 from './v2/routes/ai.js';
 import keysV2 from './v2/routes/keys.js';
@@ -27,6 +28,7 @@ import registerV2 from './v2/routes/register.js';
 import expressionsV2 from "./v2/routes/facialExpressions.js";
 import profilesV2 from './v2/routes/profiles.js';
 import SignV2 from "./v2/models/Sign.js";
+import SentenceV2 from "./v2/models/Sentence.js";
 import FacialExpressionV2 from "./v2/models/FacialExpression.js";
 import FacialExpressionSignV2 from "./v2/models/FacialExpressionSign.js";
 import UserV2 from "./v2/models/User.js";
@@ -225,6 +227,19 @@ SignV1.belongsToMany(SentenceV1, {
     as: 'sentences'
 });
 
+SentenceV2.belongsToMany(SignV2, {
+    through: 'sentence_sign',
+    foreignKey: 'sentence_id',
+    otherKey: 'sign_id',
+    as: 'signs'
+});
+SignV2.belongsToMany(SentenceV2, {
+    through: 'sentence_sign',
+    foreignKey: 'sign_id',
+    otherKey: 'sentence_id',
+    as: 'sentences'
+});
+
 
 //Routes v1
 app.use('/v1/signs', signsV1);
@@ -238,6 +253,7 @@ app.use('/v1/profiles', profilesV1);
 
 //Routes v2
 app.use('/v2/signs', signsV2);
+app.use('/v2/sentences', sentencesV2);
 app.use('/v2/login', loginV2);
 app.use('/v2/register', registerV2);
 app.use('/v2/keys', keysV2);
