@@ -5,6 +5,7 @@ import User from './v1/models/User.js';
 import Key from "./v1/models/Key.js";
 import Sign from "./v1/models/Sign.js";
 import FacialExpressionSign from "./v1/models/FacialExpressionSign.js";
+import SsoToken from "./v2/models/SsoToken.js";
 
 const sql_file_content = fs.readFileSync('./database_frame.sql', 'utf8');
 
@@ -43,6 +44,7 @@ try {
     await Key.sync({force: true});
     await FacialExpression.sync({force: true});
     await FacialExpressionSign.sync({force: true});
+    await SsoToken.sync({force:true});
 
     console.log('Successfully synced stuff')
 

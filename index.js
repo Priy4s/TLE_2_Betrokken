@@ -29,11 +29,12 @@ import SignV2 from "./v2/models/Sign.js";
 import FacialExpressionV2 from "./v2/models/FacialExpression.js";
 import FacialExpressionSignV2 from "./v2/models/FacialExpressionSign.js";
 import UserV2 from "./v2/models/User.js";
+import SsoTokenV2 from "./v2/models/SsoToken.js";
 
 
 import jwt from 'jsonwebtoken';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import {fileURLToPath} from 'url';
+import {dirname} from 'path';
 import log from "./logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -187,7 +188,7 @@ app.use((req, res, next) => {
 });
 
 //Error handler
-function errorHandler (err, req, res, next) {
+function errorHandler(err, req, res, next) {
     console.error(err.stack);
     res.status(500);
 
@@ -251,6 +252,29 @@ setInterval(async () => {
     }
 
 }, 60 * 60 * 1000);
+
+//Cronjob for clearing out the sso_tokens table
+setInterval(async () => {
+
+    try {
+
+        const destroyed = await SsoTokenV2.destroy({
+            where: {
+                created_at: {
+                    [Op.lte]: (Date.now() + 86400000)
+                }
+            }
+        });
+
+        if (destroyed > 0) {
+            console.log(`${destroyed} expired sso tokens successfully deleted`);
+        }
+
+    } catch {
+        console.error('Something went wrong when deleting expired sso_tokens');
+    }
+
+}, 86400000);
 
 //Print the port to the console so we know when it's actually running
 app.listen(process.env.EXPRESS_PORT, () => {

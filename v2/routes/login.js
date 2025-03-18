@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import SsoToken from "../models/SsoToken.js";
 
 const router = express.Router();
 
@@ -10,6 +11,12 @@ router.use(async (req, res, next) => {
     //Skip verification for the options method
     if (req.method === 'OPTIONS') {
         return next();
+    }
+
+    //Make sure the user actually sent something
+    if (!req.body.code || !req.body.ssoToken) {
+        res.status(400);
+        return res.json({error: 'Please send an object with the following properties: ssoToken, code'})
     }
 
     //Skip verification if the login uses admin credentials
@@ -41,18 +48,48 @@ router.use(async (req, res, next) => {
     //Otherwise just continue
     next();
 
-})
+});
 
-router.post('/', async (req, res, next) => {
-
-    if (!req.body.code || !req.body.ssoToken) {
-        res.status(400);
-        return res.json({error: 'Please send an object with the following properties: ssoToken, code'})
-    }
+//Make sure only one user can use an sso token
+router.use(async (req, res, next) => {
 
     try {
 
-        const user = await User.findOne({where: {code: req.body.code}});
+        const user = await User.findOne({where: {code: req.body.code}, attributes: ['id']});
+
+        if (!user) {
+            //Frontend should redirect to register
+            res.status(401);
+            return res.json({error: `User ${req.body.code} has not yet registered`});
+
+        }
+
+        const usedToken = await SsoToken.findOne({where: {token: req.body.ssoToken}});
+
+        //If the token isn't used, add it to the database
+        if (!usedToken) {
+            await SsoToken.create({token: req.body.ssoToken, user_id: user.id});
+            return next();
+        }
+
+        //If it is, make sure the user matches the token they are trying to use
+        if (usedToken.user_id !== user.id) {
+            res.status(401);
+            return res.json({error: 'ssoToken is already in use by another user'});
+        }
+
+    } catch (error) {
+        next(error);
+    }
+
+    next();
+});
+
+router.post('/', async (req, res, next) => {
+
+    try {
+
+        const user = await User.findOne({where: {code: req.body.code}, attributes: ['id', 'role']});
 
         if (!user) {
 
