@@ -3,6 +3,7 @@ import Sequelize, {Op} from 'sequelize';
 
 //v1
 import signsV1 from './v1/routes/signs.js';
+import sentencesV1 from './v1/routes/sentences.js';
 import KeyV1 from "./v1/models/Key.js";
 import aiV1 from './v1/routes/ai.js';
 import keysV1 from './v1/routes/keys.js';
@@ -14,7 +15,7 @@ import FacialExpressionV1 from "./v1/models/FacialExpression.js";
 import FacialExpressionSignV1 from "./v1/models/FacialExpressionSign.js";
 import profilesV1 from './v1/routes/profiles.js';
 import UserV1 from "./v1/models/User.js";
-
+import SentenceV1 from "./v1/models/Sentence.js";
 
 //v2
 import signsV2 from './v2/routes/signs.js';
@@ -35,6 +36,7 @@ import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import log from "./logger.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -210,8 +212,23 @@ UserV2.hasMany(KeyV2, {foreignKey: 'user_id'});
 KeyV1.belongsTo(UserV2, {foreignKey: 'user_id'});
 
 
+SentenceV1.belongsToMany(SignV1, {
+    through: 'sentence_sign',
+    foreignKey: 'sentence_id',
+    otherKey: 'sign_id',
+    as: 'signs'
+});
+SignV1.belongsToMany(SentenceV1, {
+    through: 'sentence_sign',
+    foreignKey: 'sign_id',
+    otherKey: 'sentence_id',
+    as: 'sentences'
+});
+
+
 //Routes v1
 app.use('/v1/signs', signsV1);
+app.use('/v1/sentences', sentencesV1);
 app.use('/v1/login', loginV1);
 app.use('/v1/register', registerV1);
 app.use('/v1/keys', keysV1);
